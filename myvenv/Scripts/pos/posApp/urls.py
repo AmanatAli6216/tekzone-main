@@ -14,6 +14,7 @@ urlpatterns = [
     path('userlogin', views.login_user, name="login-user"),
     path('logout', views.logoutuser, name="logout"),
     path('category', views.category, name="category-page"),
+    path('supplier', views.supplier, name="supplier-page"),
     path('manage_category', views.manage_category, name="manage_category-page"),
     path('save_category', views.save_category, name="save-category-page"),
     path('delete_category', views.delete_category, name="delete-category"),

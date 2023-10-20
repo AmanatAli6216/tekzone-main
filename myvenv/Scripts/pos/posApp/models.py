@@ -45,6 +45,7 @@ class Supplier(models.Model):
     contact = models.CharField(null=False, blank=False, unique=True) 
     address = models.CharField(max_length=200,blank=True) 
     email = models.EmailField() 
+    status = models.IntegerField(default=1)
     def __str__(self):
         return self.suppliername + ' ' +self.contact + ' '+self.address + ' '+self.email + ' '
 class Products(models.Model):

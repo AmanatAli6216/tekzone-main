@@ -2,7 +2,7 @@ from pickle import FALSE
 from django.shortcuts import redirect, render
 from django.http import HttpResponse
 from flask import jsonify
-from posApp.models import Category, Products, Sales, salesItems
+from .models import Category, Products, Sales, salesItems, Supplier
 from django.db.models import Count, Sum
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
@@ -311,3 +311,65 @@ def delete_sale(request):
         resp['msg'] = "An error occured"
         print("Unexpected error:", sys.exc_info()[0])
     return HttpResponse(json.dumps(resp), content_type='application/json')
+
+# supplier working
+def supplier(request):
+     supplier = {}
+     supplier = Supplier.objects.filter(status = 1).all()
+     if request.method == 'GET':
+         data =  request.GET
+         id = ''
+         if 'id' in data:
+             id= data['id']
+         if id.isnumeric() and int(id) > 0:
+             supplier = Supplier.objects.filter(id=id).first()
+         context = {
+         'supplier' : supplier,
+         'supplier' : supplier
+     }
+     return render(request, 'posApp/supplier.html',context)
+def test2(request):
+    supplier = Supplier.objects.all()
+    context = {
+        'supplier' : supplier
+    }
+    return render(request, 'posApp/test2.html',context)
+@login_required
+def save_supplier(request):
+    data =  request.POST
+    resp = {'status':'failed'}
+    id= ''
+    if 'id' in data:
+        id = data['id']
+    if id.isnumeric() and int(id) > 0:
+        check = Supplier.objects.exclude(id=id).filter(code=data['code']).all()
+    else:
+        check = Supplier.objects.filter(code=data['code']).all()
+    if len(check) > 0 :
+        resp['msg'] = "Supplier Code Already Exists in the database"
+    else:
+        supplier = Supplier.objects.filter(id = data['supplier_id']).first()
+        try:
+            if (data['id']).isnumeric() and int(data['id']) > 0 :
+                save_supplier = Supplier.objects.filter(id = data['id']).update(code=data['code'], supplier_id=supplier, name=data['suppliername'], description = data['contact'], price = float(data['price']),status = data['status'])
+            else:
+                save_supplier = Products(code=data['code'], category_id=category, name=data['name'], description = data['description'], price = float(data['price']),status = data['status'])
+                save_supplier.save()
+            resp['status'] = 'success'
+            messages.success(request, 'Supplier Successfully saved.')
+        except:
+            resp['status'] = 'failed'
+    return HttpResponse(json.dumps(resp), content_type="application/json")
+
+@login_required
+def delete_product(request):
+    data =  request.POST
+    resp = {'status':''}
+    try:
+        Products.objects.filter(id = data['id']).delete()
+        resp['status'] = 'success'
+        messages.success(request, 'Product Successfully deleted.')
+    except:
+        resp['status'] = 'failed'
+    return HttpResponse(json.dumps(resp), content_type="application/json")
+# @login_required
